@@ -1,52 +1,41 @@
 package main
 
 import (
-	"testing"
+	"fmt"
+	"sort"
 )
 
-func TestGetUTFLength(t *testing.T) {
-	tests := []struct {
-		name    string
-		input   []byte
-		wantLen int
-		wantErr bool
-	}{
-		{
-			name:    "Valid UTF-8",
-			input:   []byte("Hello, world!"),
-			wantLen: 13,
-			wantErr: false,
-		},
-		{
-			name:    "Empty string",
-			input:   []byte(""),
-			wantLen: 0,
-			wantErr: false,
-		},
-		{
-			name:    "Invalid UTF-8",
-			input:   []byte{0xFF, 0xFE}, // Invalid UTF-8 sequence
-			wantLen: 0,
-			wantErr: true,
-		},
-		{
-			name:    "Valid UTF-8 with multibyte runes",
-			input:   []byte("こんにちは世界"), // Japanese "Konnichiwa Sekai"
-			wantLen: 7,
-			wantErr: false,
-		},
+// Permutations возвращает все перестановки символов в строке input в алфавитном порядке.
+func Permutations(input string) []string {
+	v, result := []string{}, []string{}
+	ger := ""
+	liter := 1
+	for i := 0; i < len(input); i++ {
+		v = append(v, string(input[i]))
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			gotLen, gotErr := GetUTFLength(tt.input)
-			if (gotErr != nil) != tt.wantErr {
-				t.Errorf("GetUTFLength() error = %v, wantErr %v", gotErr, tt.wantErr)
-				return
-			}
-			if gotLen != tt.wantLen {
-				t.Errorf("GetUTFLength() = %v, want %v", gotLen, tt.wantLen)
-			}
-		})
+	for i := 1; i <= len(v); i++ {
+		liter *= i
 	}
+	for i := 0; i < liter; i++ {
+		if len(result) == liter {
+			break
+		}
+		if len(v) == (len(input)*2)-1 {
+			v = v[len(input)-1:]
+			for u := 0; u < len(v); u++ {
+				ger += v[u]
+			}
+			result = append(result, ger)
+			ger = ""
+			i = 0
+		}
+		v = append(v, v[i])
+		v[i] = v[i+1]
+	}
+	sort.Strings(result)
+	return result
+}
+func main() {
+	a := "about"
+	fmt.Println(Permutations(a))
 }
